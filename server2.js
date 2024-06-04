@@ -1,10 +1,15 @@
 const cluster = require('cluster');
 const express = require('express');
+const os = require('os');
 
 if (cluster.isMaster) {
     console.log(`Master process ${process.pid} is running`);
-    cluster.fork();
-    cluster.fork();
+    // We should create as many workers as the number of cores
+    // os.cpus().length give us the number of cores our CPU have
+    for (let i = 0; i < os.cpus().length; i++) {
+        cluster.fork();
+    }
+    console.log(`=> Number of CORES: ${os.cpus().length}`); // 8 cores => octa-core
 } else {
     console.log(`Worker process ${process.pid} is running`);
 
